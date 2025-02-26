@@ -135,3 +135,23 @@ If you like the extension and want to support author, click the button bellow.
 ## License
 
 [MIT](LICENSE)
+
+# Info on changes from original repository
+
+For some strange reason on NixOS the extension had bug when after applying environment, you get the notification asking to reload VS Code and after clicking on "Reload" nothing happens.
+
+The cause was that in reloading method there was logging before actually executing reloading command `(w/write-log log-channel (str "Executing command: " cmd-id))` and log-channel was somehow nil. I simply added a check for that case. See `execute` method in `src/main/vscode/command.cljs`.
+
+So if you're the same as me here's how you can solve the problem:
+
+* delete the original extensions if you have it installed - not sure if it's neccessary but I did it to avoid any potential conflicts;
+* clone the repository and go to root directory;
+* to be able to build the extension you first need to generate yarn files: `nix-shell -p yarn yarn2nix --run 'yarn install && yarn2nix > yarn.nix'`;
+* enter the nix-shell by running `nix-shell`;
+* compile the extension: `yarn compile`;
+* create a extension package for VS Code: `vsce package --allow-star-activation`, if there was no errors the *.vsix file will be created in root directory;
+* open VS Code and go to extensions, click on `...` (next to "Refresh" button) and select "Install from VSIX...", select file from previous step;
+* restart VS Code;
+* you're good to go!
+
+## Want to thank the author of original extension developer - it's very helpful!
